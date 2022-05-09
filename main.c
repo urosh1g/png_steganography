@@ -78,7 +78,17 @@ int main(int argc, char** argv){
 		reader->chunks->next = chunk_to_insert;
 
 		writer->write_chunks(writer->file, writer->chunks);
+		writer->chunks->next = chunk_to_insert->next;
 		free_chunk(chunk_to_insert);
+	}
+	if(read)
+		print_chunks(hidden_chunk);
+	fclose(input_image);
+	if(output_image) fclose(output_image);
+	while(chunk){
+		png_chunk_t* remove = chunk;
+		chunk = chunk->next;
+		free(remove);
 	}
 	return 0;
 }
