@@ -2,24 +2,31 @@
 #define PNG_TYPES_H
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
-#include <stdbool.h>
 
-typedef char byte;
-typedef unsigned int uint;
+const uint8_t png_sig[] = {
+	0x89, 0x50, 0x4e, 0x47,
+	0x0d, 0x0a, 0x1a, 0x0a
+};
 
-typedef struct {
-	uint length;
-	byte type[4];
-	byte* data;
-	byte crc[4];
+typedef struct pngc {
+	uint32_t length;
+	uint8_t type[5];
+	uint8_t* data;
+	uint8_t crc[5];
+	struct pngc* next;
 }png_chunk_t;
 
-png_chunk_t* new_empty_chunk();
-png_chunk_t* new_data_chunk(byte* data, uint length);
-png_chunk_t* new_all_chunk(uint length, byte* type, byte* data, byte* crc);
-void free_chunk(png_chunk_t* chunk);
+typedef struct {
+	FILE* file;
+	png_chunk_t* chunks;
+	void (*read_chunks)(FILE** file, png_chunk_t* chunks);
+}png_file_reader;
+
+typedef struct {
+	FILE* file;
+	png_chunk_t* chunks;
+	void (*write_chunks)(FILE** file, png_chunk_t* chunks);
+}png_file_writer;
 
 #endif
