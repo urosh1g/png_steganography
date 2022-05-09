@@ -6,6 +6,7 @@
 #include "./png_types.h"
 
 png_chunk_t* new_chunk();
+png_chunk_t* copy_chunk(png_chunk_t* chunk);
 void free_chunk(png_chunk_t* chunk);
 void print_chunk(png_chunk_t* chunk);
 void read_signature(FILE* f, void* buffer);
@@ -36,6 +37,7 @@ void print_chunk(png_chunk_t* chunk){
 	printf("Chunk data: ");
 	for(size_t i = 0; i < chunk->length; i++)
 		printf("0x%x ", chunk->data[i]);
+	printf("\nAs text: %s", (char*)(chunk->data));
 	printf("\nChunk CRC: ");
 	for(size_t i = 0; i < 4; i++)
 		printf("0x%x ", chunk->crc[i]);
@@ -63,13 +65,29 @@ void read_chunk(FILE* f, png_chunk_t* chunk){
 	fread(chunk->crc, byte, 4, f);
 }
 
+png_chunk_t* copy_chunk(png_chunk_t* chunk){
+	png_chunk_t* copy = new_chunk();
+	memcpy(copy, chunk, 8); //chunk length + chunk type
+	copy->data = (uint8_t*)malloc(chunk->length);
+	memcpy(copy->data, chunk->data, chunk->length);
+	memcpy(copy->crc, chunk->crc, 4);
+	//copy->next is null
+	return copy;
+}
+
 void read_chunks(FILE* f, png_chunk_t* chunks){
 	png_chunk_t* chunk = chunks;
+	png_chunk_t* hidden_chunks = hidden_chunk;
 	while(true){
 		read_chunk(f, chunk);
 		if(strcmp((char*)(chunk->type), "IEND") == 0) break;
 		if(strcmp((char*)(chunk->type), "teXt") == 0) {
-			printf("Found hidden data\n");
+			if(!hidden_chunk)
+				hidden_chunk = hidden_chunks = copy_chunk(chunk);
+			else {
+				hidden_chunks->next = copy_chunk(chunk);
+				hidden_chunks = hidden_chunks->next;
+			}
 		}
 		chunk->next = new_chunk();
 		chunk = chunk->next;

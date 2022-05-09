@@ -31,4 +31,6 @@ typedef struct {
 	void (*write_chunks)(FILE* file, png_chunk_t* chunks);
 }png_file_writer;
 
+png_chunk_t* hidden_chunk = NULL;
+
 #endif
