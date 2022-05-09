@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+const size_t byte = sizeof(uint8_t);
+
 const uint8_t png_sig[] = {
 	0x89, 0x50, 0x4e, 0x47,
 	0x0d, 0x0a, 0x1a, 0x0a
@@ -20,13 +22,13 @@ typedef struct pngc {
 typedef struct {
 	FILE* file;
 	png_chunk_t* chunks;
-	void (*read_chunks)(FILE** file, png_chunk_t* chunks);
+	void (*read_chunks)(FILE* file, png_chunk_t* chunks);
 }png_file_reader;
 
 typedef struct {
 	FILE* file;
 	png_chunk_t* chunks;
-	void (*write_chunks)(FILE** file, png_chunk_t* chunks);
+	void (*write_chunks)(FILE* file, png_chunk_t* chunks);
 }png_file_writer;
 
 #endif
