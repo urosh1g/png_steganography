@@ -119,6 +119,7 @@ void print_chunks(png_chunk_t* chunks){
 		chunk = chunk->next;
 	}
 }
+
 bool test_signature(uint8_t* sig){
 	for(size_t i = 0; i < 8; i++)
 		if(sig[i] != png_sig[i])

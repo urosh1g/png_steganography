@@ -5,11 +5,11 @@
 void print_usage(){
 	printf("USAGE:\n");
 	printf("HELP: ./program -h\n");
-	printf("WRITING TEXT TO PNG: \n./program -f input.png -w -o output.png -t \"text to be inserted\"\nREADING TEXT FROM PNG: ./program -f input.png\n");
+	printf("WRITING TEXT TO PNG: ./program -f input.png -w -o output.png -t \"text to be inserted\"\nREADING TEXT FROM PNG: ./program -f input.png\n");
 }
 
 int main(int argc, char** argv){
-	FILE* input_image, *output_image = NULL;
+	FILE* input_image = NULL, *output_image = NULL;
 	png_chunk_t* chunk = new_chunk();
 	png_chunk_t* chunk_to_insert = new_chunk();
 	uint8_t signature[8];
@@ -23,7 +23,7 @@ int main(int argc, char** argv){
 		return -1;
 	}
 
-	while((opt = getopt(argc, argv, "whvf:t:o:")) != -1){
+	while((opt = getopt(argc, argv, "hvf:t:o:")) != -1){
 		switch(opt){
 		case 'f':
 			input_image = fopen(optarg, "rb+");
@@ -31,16 +31,14 @@ int main(int argc, char** argv){
 		case 'v':
 			verbose = true;
 			break;
-		case 'w':
-			write = true;
-			read = false;
-			break;
 		case 't':
 			text_len = strlen(optarg);
 			text = malloc(text_len + 1);
 			strncpy(text, optarg, text_len);
 			break;
 		case 'o':
+			write = true;
+			read = false;
 			output_image = fopen(optarg, "wb+");
 			break;
 		default:
